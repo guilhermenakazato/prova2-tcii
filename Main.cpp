@@ -16,7 +16,7 @@
 using namespace tcii::cg;
 auto decorate(const TriangleMesh& mesh) {
     using Color = Vec3f;
-    using VA = void; // ElementAttribute<Color>;
+    using VA = ElementAttribute<Color>; // ElementAttribute<Color>;
     using TA = ElementAttribute<Color>;
     using MA = MeshAttribute<VA, TA>;
 
@@ -44,7 +44,7 @@ auto decorate(const TriangleMesh& mesh) {
 int
 main()
 {
-  auto filename = "../../meshes/f-16.obj";
+  auto filename = "./f-16.obj";
   auto mesh = readOBJ(filename);
 
   if (!mesh)

@@ -14,9 +14,12 @@
  */
 
 using namespace tcii::cg;
+using Color = Vec3f;
+using Position = Vec3f;
+using Intensity = float;
+
 auto decorate(const TriangleMesh& mesh) {
-    using Color = Vec3f;
-    using VA = ElementAttribute<Color>; // ElementAttribute<Color>;
+    using VA = ElementAttribute<Color, Intensity>; 
     using TA = ElementAttribute<Color>;
     using MA = MeshAttribute<VA, TA>;
 
@@ -24,23 +27,59 @@ auto decorate(const TriangleMesh& mesh) {
     auto nt = mesh.data().triangleCount();
     auto ma = MA::New(mesh);
 
-    // decltype pega o tipo de nv... acho que em tempo de compilação
+    // decltype pega o tipo de nv em tempo de compilação
     for(decltype(nv) i = 0; i < nv; ++i) {
-      ma->setVertexAttributes(i, Color{0, 0, 1});
+      ma->setVertexAttributes(i, Color{0, 0, 1}, Intensity{0.01f});
     }
-
-    ma->setVertexAttribute<0>(0, Color{1, 1, 0});
-    for(decltype(nv) i = 0; i < nv; ++i) {
+    
+    for(decltype(nt) i = 0; i < nt; i++) {
       ma->setTriangleAttributes(i, Color{0, 1, 0});
     }
+
+    ma->setVertexAttributes(0, Color{1, 1, 0}, Intensity{0.2f});
     ma->setTriangleAttribute<0>(0, Color{0, 1, 1});
 
     return ma;
   }
 
-/**
- * pegar o mesh dps...
- */
+  auto decorateAttributes(const TriangleMesh& mesh) {
+    using VA = ElementAttribute<Color, Position, Intensity>; 
+    using TA = ElementAttribute<Color, Position, Intensity>;
+    using MA = MeshAttribute<VA, TA>;
+
+    auto nv = mesh.data().vertexCount();
+    auto nt = mesh.data().triangleCount();
+    auto ma = MA::New(mesh);
+
+    // decltype pega o tipo de nv em tempo de compilação
+    for(decltype(nv) i = 0; i < nv; ++i) {
+      ma->setVertexAttributes(i, Color{0, 0, 1}, Position{1, 0, 0}, Intensity{2.5f});
+    }
+
+    for(decltype(nt) i = 0; i < nt; ++i) {
+      ma->setTriangleAttributes(i, Color{0, 1, 0}, Position{0, 0.5, 0}, Intensity{0.5f});
+    }
+
+    ma->setVertexAttribute<0>(0, Color{1, 1, 0});
+    ma->setVertexAttribute<1>(0, Position{1, 2, 3});
+    ma->setVertexAttribute<2>(0, Intensity{4.5f});
+
+    // ma->setVertexAttributes(0, Color{1, 1, 0}, Position{1, 1, 1}, 1.2f);
+    ma->setTriangleAttributes(0, Color{0, 1, 1}, Position{0, 0, 0}, 0.3f);
+
+    std::cout << ma->vertexAttribute<0>(1) << std::endl;
+    std::cout << ma->vertexAttribute<1>(1) << std::endl;
+    std::cout << ma->vertexAttribute<2>(1) << std::endl;
+    std::cout << "---" << std::endl;
+    std::cout << ma->triangleAttribute<0>(1) << std::endl;
+    std::cout << ma->triangleAttribute<1>(1) << std::endl;
+    std::cout << ma->triangleAttribute<2>(1) << std::endl;
+    std::cout << "---" << std::endl;
+
+
+    return ma;
+  }
+
 int
 main()
 {

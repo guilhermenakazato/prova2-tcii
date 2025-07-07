@@ -22,7 +22,7 @@ namespace tcii::cg {
     template <typename ...Fields>
     using ElementAttribute = SoA<Allocator, MeshIndex, Fields...>;
 
-    // VA = VerticeAttribute, TA = TriangleAttribute
+    // VA = VertexAttribute, TA = TriangleAttribute
     template <typename VA, typename TA> 
     class MeshAttribute : public SharedObject {
         public:
@@ -72,7 +72,7 @@ namespace tcii::cg {
             MeshAttribute(const TriangleMesh& mesh):
             _mesh{&mesh},
             _va{mesh.data().vertexCount()},
-            _ta{mesh.data().vertexCount()} 
+            _ta{mesh.data().triangleCount()} 
             {
 
             }

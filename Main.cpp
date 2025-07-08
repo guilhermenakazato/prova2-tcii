@@ -60,24 +60,40 @@ auto decorate(const TriangleMesh& mesh) {
       ma->setTriangleAttributes(i, Color{0, 1, 0}, Position{0, 0.5, 0}, Intensity{0.5f});
     }
 
-    ma->setVertexAttribute<0>(0, Color{1, 1, 0});
-    ma->setVertexAttribute<1>(0, Position{1, 2, 3});
-    ma->setVertexAttribute<2>(0, Intensity{4.5f});
-
-    // ma->setVertexAttributes(0, Color{1, 1, 0}, Position{1, 1, 1}, 1.2f);
+    ma->setVertexAttributes(0, Color{1, 1, 0}, Position{1, 1, 1}, 1.2f);
     ma->setTriangleAttributes(0, Color{0, 1, 1}, Position{0, 0, 0}, 0.3f);
 
-    std::cout << ma->vertexAttribute<0>(1) << std::endl;
-    std::cout << ma->vertexAttribute<1>(1) << std::endl;
-    std::cout << ma->vertexAttribute<2>(1) << std::endl;
-    std::cout << "---" << std::endl;
-    std::cout << ma->triangleAttribute<0>(1) << std::endl;
-    std::cout << ma->triangleAttribute<1>(1) << std::endl;
-    std::cout << ma->triangleAttribute<2>(1) << std::endl;
-    std::cout << "---" << std::endl;
-
+    // pra mostrar que os atributos dos que não foram alterados continuam os mesmos...
+    // std::cout << ma->vertexAttribute<0>(1) << std::endl;
+    // std::cout << ma->vertexAttribute<1>(1) << std::endl;
+    // std::cout << ma->vertexAttribute<2>(1) << std::endl;
+    // std::cout << "---" << std::endl;
+    // std::cout << ma->triangleAttribute<0>(1) << std::endl;
+    // std::cout << ma->triangleAttribute<1>(1) << std::endl;
+    // std::cout << ma->triangleAttribute<2>(1) << std::endl;
+    // std::cout << "---" << std::endl;
 
     return ma;
+  }
+
+  auto voidAttributeTests(const TriangleMesh& mesh) {
+    using VA = ElementAttribute<Color, Intensity>; 
+    using TA = ElementAttribute<Color>;
+    using Vertex = MeshAttribute<VA, void>; 
+    using Triangle = MeshAttribute<void, TA>;
+  
+    auto vertex = Vertex::New(mesh);
+    auto triangle = Triangle::New(mesh);
+
+    vertex->setVertexAttributes(0, Color{0.01, 0.02, 0.03}, Intensity{0.123f});
+    triangle->setTriangleAttribute<0>(0, Color{0.23, 0.09, 0.05});
+    
+    std::cout << "------------------------------- void\n";
+    std::cout << "===vertex\n";
+    std::cout << "Atributos do vertice: " << vertex->vertexAttribute<0>(0) << "," << vertex->vertexAttribute<1>(0) << "\n";
+    std::cout << "===triangle\n";
+    std::cout << "Atributos do triangulo: " << triangle->triangleAttribute<0>(0) << "\n";
+    std::cout << "------------------------------- void\n";
   }
 
 int
@@ -91,30 +107,40 @@ main()
   //else
   //  mesh->print(filename);
 
-  auto ma = decorate(*mesh);
-  std::cout << ma->vertexAttribute<0>(0) << '\n';
-  std::cout << ma->triangleAttribute<0>(0) << '\n';
+  // mostrando os atributos pós alterações
+  std::cout << "------------------------------- multiplos atributos\n";
+  auto ma1 = decorate(*mesh);
+  std::cout << "Valores dos atributos do vertice na pos. 0: " << ma1->vertexAttribute<0>(0) << "," << ma1->vertexAttribute<1>(0) << "\n";
+  std::cout << "Valores dos atributos do triangulo na pos. 0: " << ma1->triangleAttribute<0>(0) <<"\n";
+
+  auto ma2 = decorateAttributes(*mesh);
+  std::cout << "Valores dos atributos do vertice na pos. 0: " << ma2->vertexAttribute<0>(0) << "," << ma2->vertexAttribute<1>(0) << "," << ma2->vertexAttribute<2>(0) << "\n";
+  std::cout << "Valores dos atributos do triangulo na pos. 0: " << ma2->triangleAttribute<0>(0) << "," << ma2->triangleAttribute<1>(0) << "," << ma2->triangleAttribute<2>(0) << "\n";
+  std::cout << "------------------------------- fim multiplos atributos\n";
 
   ///////////////////////////////////////////////////movimento
   using VA = ElementAttribute<Color, Intensity>;
   using TA = ElementAttribute<Color>;
   using MA = MeshAttribute<VA, TA>;
    
-  auto ma2 = MA::New(std::move(ma->vertexAttributes()), *mesh);
+  auto ma3 = MA::New(std::move(ma1->vertexAttributes()), *mesh);
 
   auto n = mesh->data().triangleCount();
   for (decltype(n) i = 0; i < n; ++i) {
-      ma2->setTriangleAttributes(i, Color{ 1.0, 1.0f, 1.0f });
+      ma3->setTriangleAttributes(i, Color{ 1.0, 1.0f, 1.0f });
   }
 
   std::cout << "------------------------------- movement\n";
-  std::cout << "movement from ma: \n" << "    vertex ma2(color): " << ma2->vertexAttribute<0>(0) << '\n';
-  std::cout << "    vertex ma2(intensity): " << ma2->vertexAttribute<1>(0) << '\n';
+  std::cout << "movement from ma: \n" << "    vertex ma3(color): " << ma3->vertexAttribute<0>(0) << '\n';
+  std::cout << "    vertex ma3(intensity): " << ma3->vertexAttribute<1>(0) << '\n';
 
-  std::cout << "    triangle ma2(color): " << ma2->triangleAttribute<0>(0) << '\n';
+  std::cout << "    triangle ma3(color): " << ma3->triangleAttribute<0>(0) << '\n';
   std::cout << "------------------------------- end of movement\n";
   ///////////////////////////////////////////////////movimento
 
+  ///////////////////////////////////////////////////void
+  voidAttributeTests(*mesh);
+  ///////////////////////////////////////////////////void
 
   puts("Press any key to exit...");
   (void)getchar();

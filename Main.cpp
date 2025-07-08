@@ -88,12 +88,33 @@ main()
 
   if (!mesh)
     printf("Could not read '%s'\n", filename);
-  else
-    mesh->print(filename);
+  //else
+  //  mesh->print(filename);
 
   auto ma = decorate(*mesh);
   std::cout << ma->vertexAttribute<0>(0) << '\n';
   std::cout << ma->triangleAttribute<0>(0) << '\n';
+
+  ///////////////////////////////////////////////////movimento
+  using VA = ElementAttribute<Color, Intensity>;
+  using TA = ElementAttribute<Color>;
+  using MA = MeshAttribute<VA, TA>;
+   
+  auto ma2 = MA::New(std::move(ma->vertexAttributes()), *mesh);
+
+  auto n = mesh->data().triangleCount();
+  for (decltype(n) i = 0; i < n; ++i) {
+      ma2->setTriangleAttributes(i, Color{ 1.0, 1.0f, 1.0f });
+  }
+
+  std::cout << "------------------------------- movement\n";
+  std::cout << "movement from ma: \n" << "    vertex ma2(color): " << ma2->vertexAttribute<0>(0) << '\n';
+  std::cout << "    vertex ma2(intensity): " << ma2->vertexAttribute<1>(0) << '\n';
+
+  std::cout << "    triangle ma2(color): " << ma2->triangleAttribute<0>(0) << '\n';
+  std::cout << "------------------------------- end of movement\n";
+  ///////////////////////////////////////////////////movimento
+
 
   puts("Press any key to exit...");
   (void)getchar();

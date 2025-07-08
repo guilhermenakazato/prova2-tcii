@@ -26,14 +26,25 @@ namespace tcii::cg {
     template <typename VA, typename TA> 
     class MeshAttribute : public SharedObject {
         public:
-            // factory
+            
+            /////////////////////////////////////////////////decoracao
             static ObjectPtr<MeshAttribute> New(const TriangleMesh& mesh) {
                 return new MeshAttribute{mesh};
             }
 
+            static ObjectPtr<MeshAttribute> New(VA&& va, const TriangleMesh& mesh) {
+                return new MeshAttribute{ std::move(va), mesh };
+            }
+
+            static ObjectPtr<MeshAttribute> New(const TriangleMesh& mesh, TA&& ta) {
+                return new MeshAttribute{ mesh, std::move(ta) };
+            }
+            /////////////////////////////////////////////////decoracao
+
             /**
              * auto&&... é referência universal
              */
+            /////////////////////////////////////////////////vertices
             template <size_t I, typename Field>
             void setVertexAttribute(MeshIndex i, Field&& field) {
                 _va.template get<I>(i) = std::forward<Field>(field);
@@ -48,7 +59,9 @@ namespace tcii::cg {
             void setVertexAttributes(MeshIndex i, Fields&&... fields) {
                 _va.set(i, std::forward<Fields>(fields)...);
             } 
+            /////////////////////////////////////////////////vertices
 
+            /////////////////////////////////////////////////triangulo
             template <size_t I>
             auto& triangleAttribute(MeshIndex i) {
                 return _ta.template get<I>(i);
@@ -63,6 +76,14 @@ namespace tcii::cg {
             void setTriangleAttributes(MeshIndex i, Fields&&... fields) {
                 _ta.set(i, std::forward<Fields>(fields)...);
             }  
+            /////////////////////////////////////////////////triangulo
+
+            /////////////////////////////////////////////////getter
+            VA& vertexAttributes()& { return _va; }
+            VA&& vertexAttributes()&& { return std::move(_va); }
+            TA& triangleAttributes()& { return _ta; }
+            TA&& triangleAttributes()&& { return std::move(_ta); }
+            /////////////////////////////////////////////////getter
 
         private:
             ObjectPtr<TriangleMesh> _mesh;
@@ -73,6 +94,22 @@ namespace tcii::cg {
             _mesh{&mesh},
             _va{mesh.data().vertexCount()},
             _ta{mesh.data().triangleCount()} 
+            {
+
+            }
+
+            MeshAttribute(VA&& va, const TriangleMesh& mesh) :
+                _mesh{ &mesh },
+                _va{ std::move(va) },
+                _ta{ mesh.data().triangleCount() }
+            {
+
+            }
+
+            MeshAttribute(const TriangleMesh& mesh, TA&& ta) :
+                _mesh{ &mesh },
+                _va{ mesh.data().vertexCount() },
+                _ta{ std::move(ta) }
             {
 
             }

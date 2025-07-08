@@ -76,12 +76,6 @@ auto decorate(const TriangleMesh& mesh) {
     return ma;
   }
 
-  auto voidAttributeTests(const TriangleMesh& mesh) {
-    using VA = ElementAttribute<Color, Intensity>; 
-    using TA = ElementAttribute<Color>;
-    
-  }
-
 int
 main()
 {
@@ -139,7 +133,7 @@ main()
   auto vertex = Vertex::New(*mesh);
   auto triangle = Triangle::New(*mesh);
 
-  vertex->setVertexAttributes(0, Color{0.01, 0.02, 0.03}, Intensity{0.123f});
+  vertex->setVertexAttributes(0, Color{0.01, 0.02, 0.03}, Position{0.1, 0.2, 0.3}, Intensity{0.123f});
   triangle->setTriangleAttribute<0>(0, Color{0.23, 0.09, 0.05});
     
   std::cout << "------------------------------- void\n";
